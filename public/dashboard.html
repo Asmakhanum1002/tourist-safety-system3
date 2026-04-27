@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart Safety Dashboard</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#eef2f7;
+}
+
+/* HEADER */
+header{
+    background:#1e3c72;
+    color:white;
+    text-align:center;
+    padding:15px;
+    font-size:22px;
+}
+
+/* STATS */
+.stats{
+    display:flex;
+    justify-content:space-around;
+    padding:15px;
+}
+
+.stat{
+    background:white;
+    padding:15px;
+    width:30%;
+    text-align:center;
+    border-radius:8px;
+    box-shadow:0px 2px 6px rgba(0,0,0,0.2);
+}
+
+/* LAYOUT */
+.container{
+    display:grid;
+    grid-template-columns: 2fr 1fr;
+    gap:10px;
+    padding:10px;
+}
+
+/* MAP */
+#map{
+    height:400px;
+    border-radius:10px;
+}
+
+/* ALERT PANEL */
+.alerts{
+    background:white;
+    padding:10px;
+    border-radius:10px;
+    height:400px;
+    overflow-y:auto;
+}
+
+.alertCard{
+    padding:10px;
+    margin-bottom:8px;
+    border-left:5px solid red;
+    background:#fafafa;
+    border-radius:5px;
+}
+
+.low{color:green;}
+.medium{color:orange;}
+.high{color:red;}
+</style>
+</head>
+
+<body>
+
+<header>📊 Smart Tourist Safety Dashboard</header>
+
+<!-- STATS -->
+<div class="stats">
+    <div class="stat">
+        <h3>Total Alerts</h3>
+        <p id="total">0</p>
+    </div>
+    <div class="stat">
+        <h3>High Risk</h3>
+        <p id="high">0</p>
+    </div>
+    <div class="stat">
+        <h3>Status</h3>
+        <p>Active</p>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+    <!-- MAP -->
+    <div id="map"></div>
+
+    <!-- ALERT LIST -->
+    <div class="alerts" id="alerts"></div>
+
+</div>
+
+<script>
+
+// INIT MAP
+let map = L.map('map').setView([12.9716,77.5946],13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+.addTo(map);
+
+// SAFE ZONE
+L.circle([12.9716,77.5946],{
+    color:'green',
+    fillColor:'#3cff00',
+    fillOpacity:0.2,
+    radius:2000
+}).addTo(map);
+
+// MARKERS
+let markers = [];
+let userMarker;
+
+// LOAD ALERTS
+function loadAlerts(){
+
+fetch("/alerts")
+.then(r=>r.json())
+.then(data=>{
+
+    // CLEAR UI
+    alerts.innerHTML = "";
+
+    // REMOVE OLD MARKERS
+    markers.forEach(m=>map.removeLayer(m));
+    markers = [];
+
+    // STATS
+    document.getElementById("total").innerText = data.length;
+
+    let highCount = 0;
+
+    data.forEach(a=>{
+
+        let marker = L.marker([a.lat,a.lon]).addTo(map);
+        markers.push(marker);
+
+        if(a.risk === "HIGH") highCount++;
+
+        let rc="low";
+        if(a.risk==="HIGH") rc="high";
+        else if(a.risk==="MEDIUM") rc="medium";
+
+        let div=document.createElement("div");
+        div.className="alertCard";
+
+        div.innerHTML = `
+        <b>${a.type.toUpperCase()}</b><br>
+        Risk: <span class="${rc}">${a.risk}</span><br>
+        Time: ${a.time}
+        `;
+
+        alerts.appendChild(div);
+    });
+
+    document.getElementById("high").innerText = highCount;
+
+});
+}
+
+// LIVE USER TRACKING (on dashboard)
+navigator.geolocation.watchPosition(pos=>{
+
+    let lat = pos.coords.latitude;
+    let lon = pos.coords.longitude;
+
+    if(userMarker){
+        userMarker.setLatLng([lat,lon]);
+    } else {
+        userMarker = L.marker([lat,lon]).addTo(map)
+        .bindPopup("You").openPopup();
+    }
+
+});
+
+// AUTO LOAD + REFRESH
+loadAlerts();
+setInterval(loadAlerts, 8000);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:url('https://images.unsplash.com/photo-1501785888041-af3ef285b470') no-repeat center/cover;
+}
+
+/* OVERLAY */
+.overlay{
+    background:rgba(0,0,0,0.7);
+    min-height:100vh;
+    padding-bottom:50px;
+}
+
+/* HEADER */
+.header{
+    text-align:center;
+    color:white;
+    padding:30px;
+}
+
+/* LOGIN CARD */
+.container{
+    display:flex;
+    justify-content:center;
+    margin-top:30px;
+}
+
+.card{
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    width:300px;
+    text-align:center;
+}
+
+input{
+    width:90%;
+    padding:12px;
+    margin:10px;
+    border-radius:5px;
+    border:1px solid gray;
+}
+
+button{
+    width:95%;
+    padding:12px;
+    background:#2a5298;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+/* FAQ */
+.faq-section{
+    background:white;
+    margin:40px auto;
+    padding:20px;
+    width:80%;
+    border-radius:10px;
+}
+
+.faq-section h2{
+    text-align:center;
+}
+
+.faq{
+    max-width:600px;
+    margin:auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="overlay">
+
+<!-- HEADER -->
+<div class="header">
+<h1>🌍 Smart Tourist Safety System</h1>
+<p>Secure Login Portal</p>
+</div>
+
+<!-- LOGIN -->
+<div class="container">
+<div class="card">
+
+<h2>🔐 Login</h2>
+
+<input id="u" placeholder="Username"><br>
+<input id="p" type="password" placeholder="Password"><br>
+
+<button onclick="login()">Login</button>
+
+<p id="msg"></p>
+
+</div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+
+<h2>❓ Frequently Asked Questions</h2>
+
+<div class="faq">
+
+<p><b>What is this system?</b><br>
+It ensures tourist safety using real-time monitoring.</p>
+
+<p><b>How does geo-fencing work?</b><br>
+It alerts users when they leave a safe zone.</p>
+
+<p><b>What happens in an emergency?</b><br>
+The system sends alerts to authorities.</p>
+
+<p><b>What are Health & Safety alerts?</b><br>
+Health alerts notify ambulance services, safety alerts notify police.</p>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+function login(){
+    let user = document.getElementById("u").value;
+    let pass = document.getElementById("p").value;
+
+    if(pass === "1234"){
+        localStorage.setItem("user", user);
+        window.location.href = "index.html";
+    } else {
+        document.getElementById("msg").innerText = "❌ Invalid password (use 1234)";
+    }
+}
+</script>
+
+</body>
+</html>
